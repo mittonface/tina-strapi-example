@@ -6,9 +6,10 @@ import Head from "next/head";
 import { useForm, usePlugin, FormOptions } from "tinacms";
 import { useMemo, useEffect, useState } from "react";
 import markdownToHtml from "../../lib/markdownToHtml";
-import { InlineForm, InlineText } from "react-tinacms-inline";
+import { InlineForm, InlineText, useInlineForm } from "react-tinacms-inline";
 import { InlineWysiwyg } from "react-tinacms-editor";
 import ReactMarkdown from "react-markdown";
+import { Button as TinaButton } from "@tinacms/styles";
 
 export default function ({ post: initialPost, preview }) {
   const formConfig: any = {
@@ -38,6 +39,7 @@ export default function ({ post: initialPost, preview }) {
         <InlineWysiwyg name="content" format="markdown">
           <ReactMarkdown source={post.content} />
         </InlineWysiwyg>
+        <EditToggle />
       </InlineForm>
     </PostLayout>
   );
@@ -86,4 +88,20 @@ export async function getStaticPaths() {
     }),
     fallback: false,
   };
+}
+
+export function EditToggle() {
+  // Access 'edit mode' controls via `useInlineForm` hook
+  const { status, deactivate, activate } = useInlineForm();
+
+  return (
+    <TinaButton
+      primary
+      onClick={() => {
+        status === "active" ? deactivate() : activate();
+      }}
+    >
+      {status === "active" ? "Preview" : "Edit"}
+    </TinaButton>
+  );
 }
