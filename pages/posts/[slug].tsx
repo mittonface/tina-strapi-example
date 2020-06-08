@@ -1,8 +1,19 @@
 import PostLayout from "../../components/post-layout";
+import PostBody from "../../components/post-body";
 import { fetchGraphql } from "../../lib/api";
+import Header from "../../components/header";
+import Head from "next/head";
 
-export default function ({ post: initialPost, preview }) {
-  return <PostLayout preview={preview}>{initialPost.title}</PostLayout>;
+export default function ({ post, preview }) {
+  return (
+    <PostLayout preview={preview}>
+      <Head>
+        <title>{post.title} | Tina Strapi Example</title>
+      </Head>
+      <Header>{post.title}</Header>
+      <PostBody content={post.content} />
+    </PostLayout>
+  );
 }
 
 export async function getStaticProps({ params, preview, previewData }) {
@@ -10,6 +21,11 @@ export async function getStaticProps({ params, preview, previewData }) {
   query {
       blogPosts(where: {slug: "${params.slug}"}){
           title
+          date
+          author{
+              fullName
+          }
+          content
       }
   }`);
 
