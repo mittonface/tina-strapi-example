@@ -2,6 +2,7 @@ import Head from "next/head";
 import Header from "../components/header";
 import { fetchGraphql } from "../lib/api";
 import HeroPost from "../components/hero-post";
+import MoreStories from "../components/more-stories";
 
 export default function Home({ allPosts }) {
   const heroPost = allPosts[0];
@@ -27,7 +28,7 @@ export default function Home({ allPosts }) {
           />
         )}
 
-        {morePosts.length > 0 && <p>Here is where more posts go</p>}
+        {morePosts.length > 0 && <MoreStories posts={morePosts} />}
       </main>
 
       <footer>
