@@ -1,15 +1,16 @@
-import PostLayout from "../../components/post-layout";
-import PostBody from "../../components/post-body";
-import { fetchGraphql } from "../../lib/api";
-import Header from "../../components/header";
-import Head from "next/head";
-import { useForm, usePlugin, FormOptions } from "tinacms";
-import { useMemo, useEffect, useState } from "react";
-import markdownToHtml from "../../lib/markdownToHtml";
+import { FormOptions, useForm, usePlugin } from "tinacms";
 import { InlineForm, InlineText, useInlineForm } from "react-tinacms-inline";
+import { useEffect, useMemo, useState } from "react";
+
+import Head from "next/head";
+import Header from "../../components/header";
 import { InlineWysiwyg } from "react-tinacms-editor";
+import PostBody from "../../components/post-body";
+import PostLayout from "../../components/post-layout";
 import ReactMarkdown from "react-markdown";
 import { Button as TinaButton } from "@tinacms/styles";
+import { fetchGraphql } from "../../lib/api";
+import markdownToHtml from "../../lib/markdownToHtml";
 
 export default function ({ post: initialPost, preview }) {
   const formConfig: any = {
