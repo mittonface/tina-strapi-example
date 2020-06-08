@@ -7,6 +7,8 @@ import { useForm, usePlugin, FormOptions } from "tinacms";
 import { useMemo, useEffect, useState } from "react";
 import markdownToHtml from "../../lib/markdownToHtml";
 import { InlineForm, InlineText } from "react-tinacms-inline";
+import { InlineWysiwyg } from "react-tinacms-editor";
+import ReactMarkdown from "react-markdown";
 
 export default function ({ post: initialPost, preview }) {
   const formConfig: any = {
@@ -23,12 +25,6 @@ export default function ({ post: initialPost, preview }) {
   };
   const [post, form] = useForm(formConfig);
   usePlugin(form);
-  const initialContent = useMemo(() => post.content, []);
-  const [htmlContent, setHtmlContent] = useState(post.content);
-
-  useEffect(() => {
-    markdownToHtml(post.content).then(setHtmlContent);
-  }, [post.content]);
 
   return (
     <PostLayout preview={preview}>
@@ -36,9 +32,13 @@ export default function ({ post: initialPost, preview }) {
         <title>{initialPost.title} | Tina Strapi Example</title>
       </Head>
       <InlineForm form={form}>
-        <InlineText name="title" />
+        <Header>
+          <InlineText name="title" />
+        </Header>
+        <InlineWysiwyg name="content" format="markdown">
+          <ReactMarkdown source={post.content} />
+        </InlineWysiwyg>
       </InlineForm>
-      <PostBody content={htmlContent} />
     </PostLayout>
   );
 }
