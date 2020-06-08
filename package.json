@@ -14,6 +14,7 @@
     "next": "9.4.4",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-tinacms-inline": "^0.7.0",
     "remark": "^12.0.0",
     "remark-html": "^11.0.2",
     "styled-components": "^5.1.1",
