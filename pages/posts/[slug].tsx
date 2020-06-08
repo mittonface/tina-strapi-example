@@ -17,11 +17,41 @@ export default function ({ post: initialPost, preview }) {
     id: initialPost.slug,
     label: "Blog Post",
     initialValues: initialPost,
+    onSubmit: async (values) => {
+      const saveMutation = `
+      mutation UpdateBlogPost(
+        $id: ID!
+        $title: String
+        $content: String
+      ) {
+        updateBlogPost(
+          input: {
+            where: { id: $id }
+            data: { title: $title, content: $content}
+          }
+        ) {
+          blogPost {
+            id
+          }
+        }
+      }`;
+      const response = await fetchGraphql(saveMutation, {
+        id: values.id,
+        title: values.title,
+        content: values.content,
+        date: values.date,
+      });
+    },
     fields: [
       {
         name: "title",
         label: "Post Title",
         component: "text",
+      },
+      {
+        name: "content",
+        label: "Content",
+        component: "markdown",
       },
     ],
   };
@@ -41,6 +71,7 @@ export default function ({ post: initialPost, preview }) {
           <ReactMarkdown source={post.content} />
         </InlineWysiwyg>
         <EditToggle />
+        <SaveButton />
       </InlineForm>
     </PostLayout>
   );
@@ -50,6 +81,7 @@ export async function getStaticProps({ params, preview, previewData }) {
   const pageData = await fetchGraphql(`
   query {
       blogPosts(where: {slug: "${params.slug}"}){
+          id
           title
           date
           author{
@@ -105,4 +137,18 @@ export function EditToggle() {
       {status === "active" ? "Preview" : "Edit"}
     </TinaButton>
   );
+}
+
+export function SaveButton() {
+  const { form } = useInlineForm();
+
+  /*
+   ** If there are no changes
+   ** to save, return early
+   */
+  if (form.finalForm.getState().pristine) {
+    return null;
+  }
+
+  return <TinaButton onClick={form.submit}>Save</TinaButton>;
 }
