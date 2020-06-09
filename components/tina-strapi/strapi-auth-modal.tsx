@@ -1,3 +1,4 @@
+import { Field, Form } from "react-final-form";
 import {
   Modal,
   ModalActions,
@@ -8,6 +9,7 @@ import {
 } from "tinacms";
 
 import { AsyncButton } from "./AsyncButton";
+import { Input } from "@tinacms/fields";
 import { StyleReset } from "@tinacms/styles";
 
 export interface StrapiAuthenticationModalProps {
@@ -24,18 +26,14 @@ export function StrapiAuthenticationModal({
       title="Strapi Authentication"
       message="Please login with your Strapi account."
       close={close}
-      actions={[
-        { name: "Cancel", action: close },
-        {
-          name: "Log In",
-          action: () => {
-            alert("It is a good day to login");
-          },
-        },
-      ]}
+      actions={[]}
     >
-      <input type="text"></input>
-      <input type="password"></input>
+      <StrapiLoginForm
+        close={close}
+        onSubmit={(values) => {
+          alert(JSON.stringify(values));
+        }}
+      ></StrapiLoginForm>
     </ModalBuilder>
   );
 }
@@ -46,6 +44,41 @@ interface ModalBuilderProps {
   actions: any[];
   close(): void;
   children?: any;
+}
+
+interface LoginFormProps {
+  onSubmit(values: any): void;
+  close(): void;
+}
+
+export function StrapiLoginForm({ onSubmit, close }: LoginFormProps) {
+  return (
+    <Form
+      onSubmit={onSubmit}
+      render={({ handleSubmit }) => (
+        <form onSubmit={handleSubmit}>
+          <Field
+            name="username"
+            render={({ input, meta }) => (
+              <div>
+                <input {...input} />
+              </div>
+            )}
+          ></Field>
+          <Field
+            name="password"
+            render={({ input, meta }) => (
+              <div>
+                <input type="password" {...input} />
+              </div>
+            )}
+          ></Field>
+          <button onClick={close}>Close</button>
+          <button type="submit">Submit</button>
+        </form>
+      )}
+    ></Form>
+  );
 }
 
 export function ModalBuilder(modalProps: ModalBuilderProps) {
