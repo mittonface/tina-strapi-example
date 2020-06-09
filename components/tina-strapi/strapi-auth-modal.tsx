@@ -7,14 +7,16 @@ import {
   useCMS,
 } from "tinacms";
 
+import { AsyncButton } from "./AsyncButton";
 import { StyleReset } from "@tinacms/styles";
 
 export interface StrapiAuthenticationModalProps {
-  onAuthSuccess(): void;
   close(): void;
 }
 
-export function StrapiAuthenticationModal() {
+export function StrapiAuthenticationModal({
+  close,
+}: StrapiAuthenticationModalProps) {
   const cms = useCMS();
 
   return (
@@ -22,8 +24,19 @@ export function StrapiAuthenticationModal() {
       title="Strapi Authentication"
       message="Please login with your Strapi account."
       close={close}
-      actions={[{ name: "Cancel", action: close }]}
-    ></ModalBuilder>
+      actions={[
+        { name: "Cancel", action: close },
+        {
+          name: "Log In",
+          action: () => {
+            alert("It is a good day to login");
+          },
+        },
+      ]}
+    >
+      <input type="text"></input>
+      <input type="password"></input>
+    </ModalBuilder>
   );
 }
 
@@ -32,6 +45,7 @@ interface ModalBuilderProps {
   message: string;
   actions: any[];
   close(): void;
+  children?: any;
 }
 
 export function ModalBuilder(modalProps: ModalBuilderProps) {
@@ -42,8 +56,13 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
           <ModalHeader close={modalProps.close}>{modalProps.title}</ModalHeader>
           <ModalBody>
             <p>{modalProps.message}</p>
+            {modalProps.children}
           </ModalBody>
-          <ModalActions></ModalActions>
+          <ModalActions>
+            {modalProps.actions.map((action: any) => {
+              return <AsyncButton {...action} />;
+            })}
+          </ModalActions>
         </ModalPopup>
       </Modal>
     </StyleReset>

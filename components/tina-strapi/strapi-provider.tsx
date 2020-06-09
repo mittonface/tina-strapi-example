@@ -20,15 +20,22 @@ export const StrapiProvider = ({
   const [activeModal, setActiveModal] = useState(null);
 
   const beginAuth = async () => {
-    strapi.authenticate();
-    enterEditMode();
+    // strapi.authenticate();
+    // enterEditMode();
+    setActiveModal("authenticate");
+  };
+
+  const onClose = async () => {
+    setActiveModal(null);
   };
 
   return (
     <StrapiEditingContext.Provider
       value={{ editMode, enterEditMode: beginAuth, exitEditMode }}
     >
-      {activeModal && <StrapiAuthenticationModal />}
+      {activeModal === "authenticate" && (
+        <StrapiAuthenticationModal close={onClose} />
+      )}
       {children}
     </StrapiEditingContext.Provider>
   );
