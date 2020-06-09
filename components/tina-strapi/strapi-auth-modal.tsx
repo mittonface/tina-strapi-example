@@ -11,15 +11,19 @@ import {
 import { AsyncButton } from "./AsyncButton";
 import { Input } from "@tinacms/fields";
 import { StyleReset } from "@tinacms/styles";
+import { TinaStrapiClient } from "./tina-strapi-client";
 
 export interface StrapiAuthenticationModalProps {
+  onAuthSuccess(): void;
   close(): void;
 }
 
 export function StrapiAuthenticationModal({
+  onAuthSuccess,
   close,
 }: StrapiAuthenticationModalProps) {
   const cms = useCMS();
+  const strapi: TinaStrapiClient = cms.api.strapi;
 
   return (
     <ModalBuilder
@@ -30,8 +34,15 @@ export function StrapiAuthenticationModal({
     >
       <StrapiLoginForm
         close={close}
-        onSubmit={(values) => {
-          alert(JSON.stringify(values));
+        onSubmit={async (values: LoginFormFieldProps) => {
+          const authStatus = await strapi
+            .authenticate(values.username, values.password)
+            .then(() => {
+              alert("success");
+            })
+            .catch(() => {
+              alert("failure");
+            });
         }}
       ></StrapiLoginForm>
     </ModalBuilder>
@@ -46,8 +57,13 @@ interface ModalBuilderProps {
   children?: any;
 }
 
+interface LoginFormFieldProps {
+  username: string;
+  password: string;
+}
+
 interface LoginFormProps {
-  onSubmit(values: any): void;
+  onSubmit(values: LoginFormFieldProps): void;
   close(): void;
 }
 

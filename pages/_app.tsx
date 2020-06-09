@@ -1,10 +1,16 @@
 import { TinaCMS, TinaProvider } from "tinacms";
 
 import { StrapiProvider } from "../components/tina-strapi/strapi-provider";
+import { TinaStrapiClient } from "../components/tina-strapi/tina-strapi-client";
 import { useStrapiEditing } from "../components/tina-strapi/use-strapi-editing";
 
 export default function MyApp({ Component, pageProps }) {
-  const cms = new TinaCMS({ sidebar: { hidden: true } });
+  const cms = new TinaCMS({
+    sidebar: { hidden: true },
+    apis: {
+      strapi: new TinaStrapiClient(),
+    },
+  });
   return (
     <TinaProvider cms={cms}>
       <StrapiProvider
