@@ -38,7 +38,7 @@ export function StrapiAuthenticationModal({
           const authStatus = await strapi
             .authenticate(values.username, values.password)
             .then(() => {
-              alert("success");
+              onAuthSuccess();
             })
             .catch(() => {
               alert("failure");

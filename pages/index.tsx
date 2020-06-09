@@ -1,8 +1,8 @@
 import Head from "next/head";
 import Header from "../components/header";
-import { fetchGraphql } from "../lib/api";
 import HeroPost from "../components/hero-post";
 import MoreStories from "../components/more-stories";
+import { fetchGraphql } from "../lib/api";
 
 export default function Home({ allPosts }) {
   const heroPost = allPosts[0];
@@ -182,6 +182,16 @@ export async function getStaticProps({ params, preview, previewData }) {
       }
     }
   }`);
+
+  if (preview) {
+    return {
+      props: {
+        allPosts: pageData.data.blogPosts,
+        preview,
+        ...previewData,
+      },
+    };
+  }
 
   return {
     props: {

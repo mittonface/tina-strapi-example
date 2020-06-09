@@ -92,6 +92,18 @@ export async function getStaticProps({ params, preview, previewData }) {
 
   const post = pageData.data.blogPosts[0];
 
+  if (preview) {
+    return {
+      props: {
+        preview,
+        ...previewData,
+        post: {
+          ...post,
+        },
+      },
+    };
+  }
+
   return {
     props: {
       post: {

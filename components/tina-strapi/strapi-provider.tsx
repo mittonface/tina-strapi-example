@@ -19,8 +19,6 @@ export const StrapiProvider = ({
   const [activeModal, setActiveModal] = useState(null);
 
   const beginAuth = async () => {
-    // strapi.authenticate();
-    // enterEditMode();
     setActiveModal("authenticate");
   };
 
@@ -29,6 +27,7 @@ export const StrapiProvider = ({
   };
 
   const onAuthSuccess = async () => {
+    enterEditMode();
     setActiveModal(null);
   };
 
