@@ -10,7 +10,6 @@ import PostLayout from "../../components/post-layout";
 import ReactMarkdown from "react-markdown";
 import { Button as TinaButton } from "@tinacms/styles";
 import { fetchGraphql } from "../../lib/api";
-import markdownToHtml from "../../lib/markdownToHtml";
 
 export default function ({ post: initialPost, preview }) {
   const formConfig: any = {

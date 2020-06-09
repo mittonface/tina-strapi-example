@@ -1,5 +1,7 @@
-import { useCMS } from "tinacms";
+import { StrapiAuthenticationModal } from "./strapi-auth-modal";
 import { StrapiEditingContext } from "./strapi-editing-context";
+import { useCMS } from "tinacms";
+import { useState } from "react";
 
 interface ProviderProps {
   children: any;
@@ -15,6 +17,7 @@ export const StrapiProvider = ({
 }: ProviderProps) => {
   const cms = useCMS();
   const strapi = cms.api.strapi;
+  const [activeModal, setActiveModal] = useState(null);
 
   const beginAuth = async () => {
     strapi.authenticate();
@@ -25,6 +28,7 @@ export const StrapiProvider = ({
     <StrapiEditingContext.Provider
       value={{ editMode, enterEditMode: beginAuth, exitEditMode }}
     >
+      {activeModal && <StrapiAuthenticationModal />}
       {children}
     </StrapiEditingContext.Provider>
   );
