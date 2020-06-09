@@ -62,14 +62,13 @@ export default function ({ post: initialPost, preview }) {
       <Head>
         <title>{initialPost.title} | Tina Strapi Example</title>
       </Head>
-      <InlineForm form={form}>
+      <InlineForm form={form} initialStatus={preview ? "active" : "inactive"}>
         <Header>
           <InlineText name="title" />
         </Header>
         <InlineWysiwyg name="content" format="markdown">
           <ReactMarkdown source={post.content} />
         </InlineWysiwyg>
-        <EditToggle />
         <SaveButton />
       </InlineForm>
     </PostLayout>
@@ -132,22 +131,6 @@ export async function getStaticPaths() {
     }),
     fallback: false,
   };
-}
-
-export function EditToggle() {
-  // Access 'edit mode' controls via `useInlineForm` hook
-  const { status, deactivate, activate } = useInlineForm();
-
-  return (
-    <TinaButton
-      primary
-      onClick={() => {
-        status === "active" ? deactivate() : activate();
-      }}
-    >
-      {status === "active" ? "Preview" : "Edit"}
-    </TinaButton>
-  );
 }
 
 export function SaveButton() {
