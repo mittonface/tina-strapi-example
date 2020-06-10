@@ -181,6 +181,9 @@ export async function getStaticProps({ params, preview, previewData }) {
         fullName
       }
     }
+    pageBySlug(name:"index"){
+      blocks
+    }
   }`);
 
   if (preview) {
