@@ -10,6 +10,7 @@ import {
 import { STRAPI_JWT, STRAPI_URL, TinaStrapiClient } from "./tina-strapi-client";
 
 import { AsyncButton } from "./AsyncButton";
+import { Button } from "@tinacms/styles";
 import Cookies from "js-cookie";
 import { Input } from "@tinacms/fields";
 import { StyleReset } from "@tinacms/styles";
@@ -30,13 +31,13 @@ export function StrapiAuthenticationModal({
   return (
     <ModalBuilder
       title="Strapi Authentication"
-      message="Please login with your Strapi account."
+      message="Login with your Strapi account."
       close={close}
       actions={[]}
     >
       <StrapiLoginForm
         close={close}
-        onSuccess={onAuthSuccess}
+        onAuthSuccess={onAuthSuccess}
         onSubmit={async (values: LoginFormFieldProps) => {
           const authStatus = await strapi
             .authenticate(values.username, values.password)
@@ -48,7 +49,27 @@ export function StrapiAuthenticationModal({
               alert("failure");
             });
         }}
-      ></StrapiLoginForm>
+      />
+      <hr />
+      <div className="providerLogins">
+        Login with one of the following providers.
+        <div className="providerButtons">
+          <button
+            onClick={() =>
+              startProviderAuth({ provider: "github", onAuthSuccess })
+            }
+          >
+            GitHub
+          </button>
+          <button
+            onClick={() =>
+              startProviderAuth({ provider: "google", onAuthSuccess })
+            }
+          >
+            Google
+          </button>
+        </div>
+      </div>
     </ModalBuilder>
   );
 }
@@ -69,13 +90,13 @@ interface LoginFormFieldProps {
 interface LoginFormProps {
   onSubmit(values: LoginFormFieldProps): void;
   close(): void;
-  onSuccess(): void;
+  onAuthSuccess(): void;
 }
 
 export function StrapiLoginForm({
   onSubmit,
   close,
-  onSuccess,
+  onAuthSuccess,
 }: LoginFormProps) {
   return (
     <>
@@ -87,7 +108,7 @@ export function StrapiLoginForm({
               name="username"
               render={({ input, meta }) => (
                 <div>
-                  <input {...input} />
+                  <Input {...input} />
                 </div>
               )}
             ></Field>
@@ -95,35 +116,32 @@ export function StrapiLoginForm({
               name="password"
               render={({ input, meta }) => (
                 <div>
-                  <input type="password" {...input} />
+                  <Input type="password" {...input} />
                 </div>
               )}
             ></Field>
-            <button onClick={close}>Close</button>
-            <button type="submit">Submit</button>
+            <ModalActions>
+              <Button onClick={close}>Close</Button>
+              <Button primary type="submit">
+                Submit
+              </Button>
+            </ModalActions>
           </form>
         )}
       ></Form>
-      <button
-        onClick={() => startProviderAuth({ provider: "github", onSuccess })}
-      >
-        Login with GitHub
-      </button>
-      <button
-        onClick={() => startProviderAuth({ provider: "google", onSuccess })}
-      >
-        Login with Google
-      </button>
     </>
   );
 }
 
 interface ProviderAuthProps {
   provider: string;
-  onSuccess(): void;
+  onAuthSuccess(): void;
 }
 
-export function startProviderAuth({ provider, onSuccess }: ProviderAuthProps) {
+export function startProviderAuth({
+  provider,
+  onAuthSuccess,
+}: ProviderAuthProps) {
   let authTab: Window | undefined;
   const previousCookie = Cookies.get(STRAPI_JWT);
 
@@ -152,15 +170,10 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
       <Modal>
         <ModalPopup>
           <ModalHeader close={modalProps.close}>{modalProps.title}</ModalHeader>
-          <ModalBody>
+          <ModalBody padded>
             <p>{modalProps.message}</p>
             {modalProps.children}
           </ModalBody>
-          <ModalActions>
-            {modalProps.actions.map((action: any) => {
-              return <AsyncButton {...action} />;
-            })}
-          </ModalActions>
         </ModalPopup>
       </Modal>
     </StyleReset>
