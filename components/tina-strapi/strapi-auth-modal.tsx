@@ -36,6 +36,7 @@ export function StrapiAuthenticationModal({
     >
       <StrapiLoginForm
         close={close}
+        onSuccess={onAuthSuccess}
         onSubmit={async (values: LoginFormFieldProps) => {
           const authStatus = await strapi
             .authenticate(values.username, values.password)
@@ -68,9 +69,14 @@ interface LoginFormFieldProps {
 interface LoginFormProps {
   onSubmit(values: LoginFormFieldProps): void;
   close(): void;
+  onSuccess(): void;
 }
 
-export function StrapiLoginForm({ onSubmit, close }: LoginFormProps) {
+export function StrapiLoginForm({
+  onSubmit,
+  close,
+  onSuccess,
+}: LoginFormProps) {
   return (
     <>
       <Form
@@ -98,11 +104,13 @@ export function StrapiLoginForm({ onSubmit, close }: LoginFormProps) {
           </form>
         )}
       ></Form>
-      <button onClick={startGithubAuth}>Login with GitHub</button>
+      <button onClick={() => startGithubAuth(onSuccess)}>
+        Login with GitHub
+      </button>
     </>
   );
 }
-export function startGithubAuth() {
+export function startGithubAuth(onSuccess) {
   let authTab: Window | undefined;
   const previousCookie = Cookies.get(STRAPI_JWT);
 
@@ -112,6 +120,7 @@ export function startGithubAuth() {
     console.log(currentCookie);
     if (currentCookie && currentCookie != previousCookie) {
       authTab.close();
+      onSuccess();
     }
   }, 1000);
 
