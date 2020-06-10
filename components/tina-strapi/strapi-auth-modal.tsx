@@ -151,7 +151,7 @@ export function startProviderAuth({
     const currentCookie = Cookies.get(STRAPI_JWT);
     if (currentCookie && currentCookie != previousCookie) {
       authTab.close();
-      onSuccess();
+      onAuthSuccess();
     }
   }, 1000);
 
