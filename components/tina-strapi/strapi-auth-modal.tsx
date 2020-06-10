@@ -104,20 +104,33 @@ export function StrapiLoginForm({
           </form>
         )}
       ></Form>
-      <button onClick={() => startGithubAuth(onSuccess)}>
+      <button
+        onClick={() => startProviderAuth({ provider: "github", onSuccess })}
+      >
         Login with GitHub
+      </button>
+      <button
+        onClick={() => startProviderAuth({ provider: "google", onSuccess })}
+      >
+        Login with Google
       </button>
     </>
   );
 }
-export function startGithubAuth(onSuccess) {
+
+interface ProviderAuthProps {
+  provider: string;
+  onSuccess(): void;
+}
+
+export function startProviderAuth({ provider, onSuccess }: ProviderAuthProps) {
   let authTab: Window | undefined;
   const previousCookie = Cookies.get(STRAPI_JWT);
 
+  // poll the cookie value for a change. close the auth window on change
+  // there are no native JS events that support this behaviour
   window.setInterval(() => {
     const currentCookie = Cookies.get(STRAPI_JWT);
-    console.log(previousCookie);
-    console.log(currentCookie);
     if (currentCookie && currentCookie != previousCookie) {
       authTab.close();
       onSuccess();
@@ -125,7 +138,7 @@ export function startGithubAuth(onSuccess) {
   }, 1000);
 
   authTab = popupWindow(
-    STRAPI_URL + "/connect/github",
+    STRAPI_URL + `/connect/${provider}`,
     "_blank",
     window,
     1000,
