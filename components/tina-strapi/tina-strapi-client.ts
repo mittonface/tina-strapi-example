@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import axios from "axios";
 
 export const STRAPI_JWT = "tina_strapi_jwt";

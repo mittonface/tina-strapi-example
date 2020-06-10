@@ -7,12 +7,13 @@ import {
   ModalPopup,
   useCMS,
 } from "tinacms";
-import { STRAPI_JWT, TinaStrapiClient } from "./tina-strapi-client";
+import { STRAPI_JWT, STRAPI_URL, TinaStrapiClient } from "./tina-strapi-client";
 
 import { AsyncButton } from "./AsyncButton";
 import Cookies from "js-cookie";
 import { Input } from "@tinacms/fields";
 import { StyleReset } from "@tinacms/styles";
+import popupWindow from "./popupWindow";
 
 export interface StrapiAuthenticationModalProps {
   onAuthSuccess(): void;
@@ -71,31 +72,55 @@ interface LoginFormProps {
 
 export function StrapiLoginForm({ onSubmit, close }: LoginFormProps) {
   return (
-    <Form
-      onSubmit={onSubmit}
-      render={({ handleSubmit }) => (
-        <form onSubmit={handleSubmit}>
-          <Field
-            name="username"
-            render={({ input, meta }) => (
-              <div>
-                <input {...input} />
-              </div>
-            )}
-          ></Field>
-          <Field
-            name="password"
-            render={({ input, meta }) => (
-              <div>
-                <input type="password" {...input} />
-              </div>
-            )}
-          ></Field>
-          <button onClick={close}>Close</button>
-          <button type="submit">Submit</button>
-        </form>
-      )}
-    ></Form>
+    <>
+      <Form
+        onSubmit={onSubmit}
+        render={({ handleSubmit }) => (
+          <form onSubmit={handleSubmit}>
+            <Field
+              name="username"
+              render={({ input, meta }) => (
+                <div>
+                  <input {...input} />
+                </div>
+              )}
+            ></Field>
+            <Field
+              name="password"
+              render={({ input, meta }) => (
+                <div>
+                  <input type="password" {...input} />
+                </div>
+              )}
+            ></Field>
+            <button onClick={close}>Close</button>
+            <button type="submit">Submit</button>
+          </form>
+        )}
+      ></Form>
+      <button onClick={startGithubAuth}>Login with GitHub</button>
+    </>
+  );
+}
+export function startGithubAuth() {
+  let authTab: Window | undefined;
+  const previousCookie = Cookies.get(STRAPI_JWT);
+
+  window.setInterval(() => {
+    const currentCookie = Cookies.get(STRAPI_JWT);
+    console.log(previousCookie);
+    console.log(currentCookie);
+    if (currentCookie && currentCookie != previousCookie) {
+      authTab.close();
+    }
+  }, 1000);
+
+  authTab = popupWindow(
+    STRAPI_URL + "/connect/github",
+    "_blank",
+    window,
+    1000,
+    700
   );
 }
 
