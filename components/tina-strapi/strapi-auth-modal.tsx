@@ -7,11 +7,12 @@ import {
   ModalPopup,
   useCMS,
 } from "tinacms";
+import { STRAPI_JWT, TinaStrapiClient } from "./tina-strapi-client";
 
 import { AsyncButton } from "./AsyncButton";
+import Cookies from "js-cookie";
 import { Input } from "@tinacms/fields";
 import { StyleReset } from "@tinacms/styles";
-import { TinaStrapiClient } from "./tina-strapi-client";
 
 export interface StrapiAuthenticationModalProps {
   onAuthSuccess(): void;
@@ -37,7 +38,8 @@ export function StrapiAuthenticationModal({
         onSubmit={async (values: LoginFormFieldProps) => {
           const authStatus = await strapi
             .authenticate(values.username, values.password)
-            .then(() => {
+            .then((authData) => {
+              Cookies.set(STRAPI_JWT, authData.data.jwt);
               onAuthSuccess();
             })
             .catch(() => {

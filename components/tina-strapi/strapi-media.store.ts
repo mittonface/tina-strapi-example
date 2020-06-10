@@ -1,4 +1,5 @@
 import { Media, MediaStore, MediaUploadOptions } from "@tinacms/media";
+
 import { STRAPI_URL } from "./tina-strapi-client";
 import axios from "axios";
 
@@ -10,7 +11,6 @@ export class StrapiMediaStore implements MediaStore {
 
     for (const { file } of files) {
       const upload = await uploadFile(file);
-      console.log(upload);
       uploaded.push({
         directory: "/uploads",
         filename: upload.data[0].hash + upload.data[0].ext,
