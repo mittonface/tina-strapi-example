@@ -12,11 +12,8 @@ export default function MyApp({ Component, pageProps }) {
     },
   });
 
-  if (pageProps.preview) {
-    cms.enable();
-  } else {
-    cms.disable();
-  }
+  pageProps.preview ? cms.enable() : cms.disable();
+
   return (
     <TinaProvider cms={cms}>
       <StrapiProvider

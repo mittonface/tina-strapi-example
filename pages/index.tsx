@@ -1,12 +1,77 @@
+import {
+  BlocksControls,
+  InlineBlocks,
+  InlineForm,
+  InlineImage,
+} from "react-tinacms-inline";
+import { useForm, usePlugin } from "tinacms";
+
 import Head from "next/head";
 import Header from "../components/header";
 import HeroPost from "../components/hero-post";
 import MoreStories from "../components/more-stories";
+import { STRAPI_URL } from "../components/tina-strapi/tina-strapi-client";
 import { fetchGraphql } from "../lib/api";
+import get from "lodash.get";
 
-export default function Home({ allPosts }) {
+export function Image(props) {
+  return (
+    <BlocksControls index={props.index}>
+      <InlineImage
+        name="coverImage.url"
+        previewSrc={(formValues) => {
+          return STRAPI_URL + get(formValues, "coverImage.url");
+        }}
+        uploadDir={() => {
+          return `/uploads/`;
+        }}
+        parse={(filename) => {
+          return `/uploads/${filename}`;
+        }}
+      >
+        {() => {
+          return <img src={STRAPI_URL + props.data.coverImage.url} />;
+        }}
+      </InlineImage>
+    </BlocksControls>
+  );
+}
+
+export const image_template = {
+  label: "Image",
+  type: "image",
+  key: "image-block",
+  defaultItem: {
+    coverImage: { url: "" },
+    _template: "image",
+  },
+  fields: [],
+};
+
+const PAGE_BLOCKS = {
+  image: {
+    Component: Image,
+    template: image_template,
+  },
+};
+
+export default function Home({ allPosts, blocks: initialBlocks }) {
   const heroPost = allPosts[0];
   const morePosts = allPosts.slice(1);
+
+  const formConfig = {
+    id: "index",
+    label: "index",
+    initialValues: initialBlocks,
+    onSubmit: () => {
+      alert("nice");
+    },
+    fields: [],
+  };
+
+  const [blocks, form] = useForm(formConfig);
+  usePlugin(form);
+
   return (
     <div className="container">
       <Head>
@@ -18,6 +83,9 @@ export default function Home({ allPosts }) {
         <Header>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </Header>
+        <InlineForm form={form}>
+          <InlineBlocks name="blocks" blocks={PAGE_BLOCKS} />
+        </InlineForm>
         {heroPost && (
           <HeroPost
             date={heroPost.date}
@@ -186,10 +254,12 @@ export async function getStaticProps({ params, preview, previewData }) {
     }
   }`);
 
+  console.log(JSON.stringify(pageData.data.pageBySlug.blocks));
   if (preview) {
     return {
       props: {
         allPosts: pageData.data.blogPosts,
+        blocks: pageData.data.pageBySlug.blocks,
         preview,
         ...previewData,
       },
@@ -200,6 +270,7 @@ export async function getStaticProps({ params, preview, previewData }) {
     props: {
       preview: false,
       allPosts: pageData.data.blogPosts,
+      blocks: pageData.data.pageBySlug.blocks,
     },
   };
 }
