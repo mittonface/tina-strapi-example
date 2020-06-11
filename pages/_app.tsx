@@ -11,6 +11,12 @@ export default function MyApp({ Component, pageProps }) {
       strapi: new TinaStrapiClient(),
     },
   });
+
+  if (pageProps.preview) {
+    cms.enable();
+  } else {
+    cms.disable();
+  }
   return (
     <TinaProvider cms={cms}>
       <StrapiProvider
