@@ -1,3 +1,4 @@
+import { Button, StyleReset } from "@tinacms/styles";
 import { Field, Form } from "react-final-form";
 import {
   Modal,
@@ -10,10 +11,8 @@ import {
 import { STRAPI_JWT, STRAPI_URL, TinaStrapiClient } from "./tina-strapi-client";
 
 import { AsyncButton } from "./AsyncButton";
-import { Button } from "@tinacms/styles";
 import Cookies from "js-cookie";
 import { Input } from "@tinacms/fields";
-import { StyleReset } from "@tinacms/styles";
 import popupWindow from "./popupWindow";
 
 export interface StrapiAuthenticationModalProps {

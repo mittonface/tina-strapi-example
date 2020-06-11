@@ -240,7 +240,8 @@ export default function Home({ allPosts, blocks: initialBlocks }) {
 export async function getStaticProps({ params, preview, previewData }) {
   const pageData = await fetchGraphql(`
   query {
-    blogPosts {
+    pageBySlug(name:"index"){
+      highlightedPosts {
       title
       summary
       date
@@ -258,7 +259,7 @@ export async function getStaticProps({ params, preview, previewData }) {
   if (preview) {
     return {
       props: {
-        allPosts: pageData.data.blogPosts,
+        allPosts: pageData.data.pageBySlug.highlightedPosts,
         blocks: pageData.data.pageBySlug.blocks,
         preview,
         ...previewData,
