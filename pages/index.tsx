@@ -10,6 +10,7 @@ import Head from "next/head";
 import Header from "../components/header";
 import HeroPost from "../components/hero-post";
 import MoreStories from "../components/more-stories";
+import PostPreview from "../components/post-preview";
 import { STRAPI_URL } from "../components/tina-strapi/tina-strapi-client";
 import { fetchGraphql } from "../lib/api";
 import get from "lodash.get";
@@ -55,10 +56,7 @@ const PAGE_BLOCKS = {
   },
 };
 
-export default function Home({ allPosts, blocks: initialBlocks }) {
-  const heroPost = allPosts[0];
-  const morePosts = allPosts.slice(1);
-
+export default function Home({ highlightedPosts, blocks: initialBlocks }) {
   const formConfig = {
     id: "index",
     label: "index",
@@ -86,17 +84,18 @@ export default function Home({ allPosts, blocks: initialBlocks }) {
         <InlineForm form={form}>
           <InlineBlocks name="blocks" blocks={PAGE_BLOCKS} />
         </InlineForm>
-        {heroPost && (
-          <HeroPost
-            date={heroPost.date}
-            slug={heroPost.slug}
-            author={heroPost.author}
-            excerpt={heroPost.summary}
-            title={heroPost.title}
-          />
-        )}
-
-        {morePosts.length > 0 && <MoreStories posts={morePosts} />}
+        <h3>Highlighted Posts</h3>
+        {highlightedPosts &&
+          highlightedPosts.map((post) => (
+            <PostPreview
+              date={post.date}
+              slug={post.slug}
+              author={post.author}
+              excerpt={post.summary}
+              title={post.title}
+              coverImage=""
+            ></PostPreview>
+          ))}
       </main>
 
       <footer>
@@ -126,7 +125,7 @@ export default function Home({ allPosts, blocks: initialBlocks }) {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          align-items: center;
+          align-items: left;
         }
 
         footer {
@@ -242,15 +241,13 @@ export async function getStaticProps({ params, preview, previewData }) {
   query {
     pageBySlug(name:"index"){
       highlightedPosts {
-      title
-      summary
-      date
-      slug
-      author {
-        fullName
+        title
+        summary
+        slug
+        author {
+          fullName
+        }
       }
-    }
-    pageBySlug(name:"index"){
       blocks
     }
   }`);
@@ -259,7 +256,7 @@ export async function getStaticProps({ params, preview, previewData }) {
   if (preview) {
     return {
       props: {
-        allPosts: pageData.data.pageBySlug.highlightedPosts,
+        highlightedPosts: pageData.data.pageBySlug.highlightedPosts,
         blocks: pageData.data.pageBySlug.blocks,
         preview,
         ...previewData,
@@ -270,7 +267,7 @@ export async function getStaticProps({ params, preview, previewData }) {
   return {
     props: {
       preview: false,
-      allPosts: pageData.data.blogPosts,
+      highlightedPosts: pageData.data.pageBySlug.highlightedPosts,
       blocks: pageData.data.pageBySlug.blocks,
     },
   };
