@@ -5,9 +5,11 @@ import {
   InlineImage,
   InlineText,
   InlineTextarea,
+  useInlineForm,
 } from "react-tinacms-inline";
 import { useForm, usePlugin } from "tinacms";
 
+import { Button } from "@tinacms/styles";
 import Head from "next/head";
 import Header from "../components/header";
 import HeroPost from "../components/hero-post";
@@ -19,32 +21,36 @@ import get from "lodash.get";
 
 export function Image(props) {
   return (
-    <BlocksControls index={props.index}>
-      <InlineImage
-        name="coverImage.url"
-        previewSrc={(formValues) => {
-          return STRAPI_URL + get(formValues, "coverImage.url");
-        }}
-        uploadDir={() => {
-          return `/uploads/`;
-        }}
-        parse={(filename) => {
-          return `/uploads/${filename}`;
-        }}
-      >
-        {() => {
-          return <img src={STRAPI_URL + props.data.coverImage.url} />;
-        }}
-      </InlineImage>
-    </BlocksControls>
+    <section>
+      <BlocksControls index={props.index}>
+        <InlineImage
+          name="coverImage.url"
+          previewSrc={(formValues) => {
+            return STRAPI_URL + get(formValues, "coverImage.url");
+          }}
+          uploadDir={() => {
+            return `/uploads/`;
+          }}
+          parse={(filename) => {
+            return `/uploads/${filename}`;
+          }}
+        >
+          {() => {
+            return <img src={STRAPI_URL + props.data.coverImage.url} />;
+          }}
+        </InlineImage>
+      </BlocksControls>
+    </section>
   );
 }
 
 export function Content(props) {
   return (
-    <BlocksControls index={props.index}>
-      <InlineTextarea name="content" />
-    </BlocksControls>
+    <section>
+      <BlocksControls index={props.index}>
+        <InlineTextarea name="content" />
+      </BlocksControls>
+    </section>
   );
 }
 
@@ -65,7 +71,7 @@ export const content_template = {
   key: "content-block",
   defaultItem: {
     content: "I'm a really cool block of content",
-    _template: "content",
+    _template: "textarea",
   },
   fields: [],
 };
@@ -86,8 +92,23 @@ export default function Home({ pageData }) {
     id: "index",
     label: "index",
     initialValues: pageData,
-    onSubmit: () => {
-      alert("nice");
+    onSubmit: async (values) => {
+      const saveMutation = `
+      mutation UpdatePage($id: ID!, $pageTitle: String, $blocks: JSON) {
+        updatePage(
+          input: { where: { id: $id }, data: { pageTitle: $pageTitle, blocks: $blocks } }
+        ) {
+          page {
+            id
+          }
+        }
+      }
+      `;
+      const response = await fetchGraphql(saveMutation, {
+        id: values.id,
+        pageTitle: values.title,
+        blocks: values.blocks,
+      });
     },
     fields: [],
   };
@@ -108,6 +129,7 @@ export default function Home({ pageData }) {
             <InlineText name="pageTitle" />
           </Header>
           <InlineBlocks name="blocks.blocks" blocks={PAGE_BLOCKS} />
+          <SaveButton />
         </InlineForm>
         <h3>Highlighted Posts</h3>
         {pageData.highlightedPosts &&
@@ -261,10 +283,24 @@ export default function Home({ pageData }) {
   );
 }
 
+export function SaveButton() {
+  const { form } = useInlineForm();
+
+  /*
+   ** If there are no changes
+   ** to save, return early
+   */
+  if (form.finalForm.getState().pristine) {
+    return null;
+  }
+
+  return <Button onClick={form.submit}>Save</Button>;
+}
 export async function getStaticProps({ params, preview, previewData }) {
   const pageData = await fetchGraphql(`
   query {
     pageBySlug(name:"index"){
+      id
       pageTitle
       highlightedPosts {
         title
