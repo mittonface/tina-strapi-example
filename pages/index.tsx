@@ -3,6 +3,8 @@ import {
   InlineBlocks,
   InlineForm,
   InlineImage,
+  InlineText,
+  InlineTextarea,
 } from "react-tinacms-inline";
 import { useForm, usePlugin } from "tinacms";
 
@@ -38,6 +40,14 @@ export function Image(props) {
   );
 }
 
+export function Content(props) {
+  return (
+    <BlocksControls index={props.index}>
+      <InlineTextarea name="content" />
+    </BlocksControls>
+  );
+}
+
 export const image_template = {
   label: "Image",
   type: "image",
@@ -49,25 +59,40 @@ export const image_template = {
   fields: [],
 };
 
+export const content_template = {
+  label: "Content",
+  name: "content",
+  key: "content-block",
+  defaultItem: {
+    content: "I'm a really cool block of content",
+    _template: "content",
+  },
+  fields: [],
+};
+
 const PAGE_BLOCKS = {
   image: {
     Component: Image,
     template: image_template,
   },
+  textarea: {
+    Component: Content,
+    template: content_template,
+  },
 };
 
-export default function Home({ highlightedPosts, blocks: initialBlocks }) {
+export default function Home({ pageData }) {
   const formConfig = {
     id: "index",
     label: "index",
-    initialValues: initialBlocks,
+    initialValues: pageData,
     onSubmit: () => {
       alert("nice");
     },
     fields: [],
   };
 
-  const [blocks, form] = useForm(formConfig);
+  const [page, form] = useForm(formConfig);
   usePlugin(form);
 
   return (
@@ -78,15 +103,15 @@ export default function Home({ highlightedPosts, blocks: initialBlocks }) {
       </Head>
 
       <main>
-        <Header>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </Header>
         <InlineForm form={form}>
-          <InlineBlocks name="blocks" blocks={PAGE_BLOCKS} />
+          <Header>
+            <InlineText name="pageTitle" />
+          </Header>
+          <InlineBlocks name="blocks.blocks" blocks={PAGE_BLOCKS} />
         </InlineForm>
         <h3>Highlighted Posts</h3>
-        {highlightedPosts &&
-          highlightedPosts.map((post) => (
+        {pageData.highlightedPosts &&
+          pageData.highlightedPosts.map((post) => (
             <PostPreview
               date={post.date}
               slug={post.slug}
@@ -240,6 +265,7 @@ export async function getStaticProps({ params, preview, previewData }) {
   const pageData = await fetchGraphql(`
   query {
     pageBySlug(name:"index"){
+      pageTitle
       highlightedPosts {
         title
         summary
@@ -252,12 +278,10 @@ export async function getStaticProps({ params, preview, previewData }) {
     }
   }`);
 
-  console.log(JSON.stringify(pageData.data.pageBySlug.blocks));
   if (preview) {
     return {
       props: {
-        highlightedPosts: pageData.data.pageBySlug.highlightedPosts,
-        blocks: pageData.data.pageBySlug.blocks,
+        pageData: pageData.data.pageBySlug,
         preview,
         ...previewData,
       },
@@ -266,9 +290,8 @@ export async function getStaticProps({ params, preview, previewData }) {
 
   return {
     props: {
+      pageData: pageData.data.pageBySlug,
       preview: false,
-      highlightedPosts: pageData.data.pageBySlug.highlightedPosts,
-      blocks: pageData.data.pageBySlug.blocks,
     },
   };
 }
