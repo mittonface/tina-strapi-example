@@ -1,5 +1,6 @@
 import { TinaCMS, TinaProvider } from "tinacms";
 
+import { StrapiMediaStore } from "../components/tina-strapi/strapi-media.store";
 import { StrapiProvider } from "../components/tina-strapi/strapi-provider";
 import { TinaStrapiClient } from "../components/tina-strapi/tina-strapi-client";
 import { useStrapiEditing } from "../components/tina-strapi/use-strapi-editing";
@@ -9,6 +10,9 @@ export default function MyApp({ Component, pageProps }) {
     sidebar: { hidden: true },
     apis: {
       strapi: new TinaStrapiClient(),
+    },
+    media: {
+      store: new StrapiMediaStore(),
     },
   });
 
